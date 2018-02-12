@@ -1,14 +1,14 @@
 {
-  "name": "prow",
+  "name": "nonorow",
   "version": "1.0.0",
-  "description": "",
+  "description": "Finds unshiftable overlap in nonogram rows",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Jonathon Ball",
+  "license": "MIT",
   "dependencies": {
-    "js-combinatorics": "^0.5.3"
+    "lodash": "^4.17.5"
   }
 }
