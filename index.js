@@ -1,5 +1,13 @@
 const _ = require('lodash');
 
+const argv = require('yargs')
+    .command('nonogram [clues..]', 'analyze nonogram clues')
+    .default('size', 15)
+    .describe('size', 'Width of nonogram board')
+    .help('h')
+    .alias('h', 'help')
+    .argv;
+
 class Row {
 
     constructor(data, size) {
@@ -102,31 +110,19 @@ class Row {
 
 }
 
-/*
-const tests = [
-    [3,3],
-    [3,3],
-    [2,1,3],
-    [4,1,1,1],
-    [5,1,2,1],
-    [5,4,2],
-    [3,1,1,3],
-    [3,2,4],
-    [2,2,1],
-    [2,1],
-    [2,3,2,2],
-    [2,3,2],
-    [3,7],
-    [4,7],
-    [4,1]
-];
-
-for (let i = 0; i < tests.length; i++) {
-    let test = new Row(tests[i], 15);
-    console.log(test.blocks);
-    console.log(test.results());
-
+if (require.main === module) {
+    var blocks = argv._;
+    if (blocks.filter((block) => !isNaN(block)).length == blocks.length) {
+        var row = new Row(blocks, argv.size);
+        var results = row.results();
+        if (results) {
+            console.log(results);
+        }
+    } else {
+        console.log('Please provide numerical clue data only.');
+        console.log(blocks);
+        process.exit(1);
+    }
 }
-*/
 
 module.exports = Row;
