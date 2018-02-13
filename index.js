@@ -1,7 +1,7 @@
 const _ = require('lodash');
 
 const argv = require('yargs')
-    .command('nonogram [clues..]', 'analyze nonogram clues')
+    .command('nonorow [clues..]', 'analyze nonogram clues')
     .default('size', 15)
     .describe('size', 'Width of nonogram board')
     .help('h')
