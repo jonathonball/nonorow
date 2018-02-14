@@ -76,27 +76,41 @@ class Row {
         return Row.directionalTotal(rightBlocks);
     }
 
-    findUnshiftable() {
-        this.unshiftables = [];
-        this.blocks.forEach((block, index, blocks) => {
-            let leftTotal = Row.leftTotal(blocks, index);
-            let rightTotal = Row.rightTotal(blocks, index);
-            let used = leftTotal + rightTotal;
-            let space = this.size - used;
-            let overlap = (block - (space / 2)) * 2;
-            let offset = ((space - overlap) / 2) + leftTotal;
+    static findOverlap(block, blocks, index, size) {
+        let leftTotal = Row.leftTotal(blocks, index);
+        let rightTotal = Row.rightTotal(blocks, index);
+        let used = leftTotal + rightTotal;
+        let space = size - used;
+        let overlap = (block - (space / 2)) * 2;
+        let offset = ((space - overlap) / 2) + leftTotal;
+        return {
+            overlap: overlap,
+            offset: offset
+        };
+    }
+
+    static findUnshiftable(blocks, size) {
+        let unshiftables = [];
+        blocks.forEach((block, index, blocks) => {
+            let overlapData = Row.findOverlap(block, blocks, index, size);
+            let overlap = overlapData.overlap;
+            let offset = overlapData.offset;
             if (overlap > 0) {
                 let unshiftable = Row.createRange(offset, false)
                                       .concat(Row.createRange(overlap, true));
-                while (unshiftable.length < this.size) {
+                while (unshiftable.length < size) {
                     unshiftable.push(false);
                 }
-                if (unshiftable.length && unshiftable.length == this.size) {
-                    this.unshiftables.push(unshiftable);
+                if (unshiftable.length && unshiftable.length == size) {
+                    unshiftables.push(unshiftable);
                 }
             }
-        }, this);
-        this.possibleRows = Row._arrayLogicalOr(this.unshiftables);
+        });
+        return Row._arrayLogicalOr(unshiftables);
+    }
+
+    findUnshiftable() {
+        this.possibleRows = Row.findUnshiftable(this.blocks, this.size);
         return this;
     }
 
