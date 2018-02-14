@@ -66,7 +66,7 @@ class Row {
                 while (unshiftable.length < this.size) {
                     unshiftable.push(false);
                 }
-                if (unshiftable.length) {
+                if (unshiftable.length && unshiftable.length == this.size) {
                     this.unshiftables.push(unshiftable);
                 }
             }
