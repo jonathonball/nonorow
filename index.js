@@ -11,18 +11,25 @@ const argv = require('yargs')
 class Row {
 
     constructor(data, size) {
-        this.size = size;
-        this.value = Row.createRange(size, ' ');
+        this.size         = size;
+        this.value        = Row.createRange(size, ' ');
         this.possibleRows = [];
-        this.blocks = [].concat(data);
-        this.minGaps = undefined;
-        this.total = undefined;
-        this.maxDelta = undefined;
-        this.setMinGaps();
-        this.setTotal();
-        this.setMaxDelta();
-        this.findUnshiftable();
+        this.blocks       = [].concat(data);
+        this.minGaps      = undefined;
+        this.total        = undefined;
+        this.maxDelta     = undefined;
+        if (blocks.length) {
+            this.analyze();
+        }
         return this;
+    }
+
+    analyze() {
+        return this.setMinGaps()
+           .setTotal()
+           .setMaxDelta()
+           .findUnshiftable()
+           .results();
     }
 
     static createRange(size, fill) {
@@ -52,15 +59,28 @@ class Row {
 
     setMaxDelta() {
         this.maxDelta = this.size - this.total;
+        return this;
+    }
+
+    static directionalTotal(blocks) {
+        return (blocks.length) ? Row.findTotal(blocks) + 1 : 0;
+    }
+
+    static leftTotal(blocks, index) {
+        let leftBlocks = (blocks[index - 1]) ? blocks.slice(0, index) : [];
+        return Row.directionalTotal(leftBlocks);
+    }
+
+    static rightTotal(blocks, index) {
+        let rightBlocks = (blocks[index + 1]) ? blocks.slice(index + 1) : [];
+        return Row.directionalTotal(rightBlocks);
     }
 
     findUnshiftable() {
         this.unshiftables = [];
         this.blocks.forEach((block, index, blocks) => {
-            let leftBlocks = (blocks[index - 1]) ? blocks.slice(0, index) : [];
-            let leftTotal = (leftBlocks.length) ? Row.findTotal(leftBlocks) + 1 : 0;
-            let rightBlocks = (blocks[index + 1]) ? blocks.slice(index + 1) : [];
-            let rightTotal = (rightBlocks.length) ? Row.findTotal(rightBlocks) + 1 : 0;
+            let leftTotal = Row.leftTotal(blocks, index);
+            let rightTotal = Row.rightTotal(blocks, index);
             let used = leftTotal + rightTotal;
             let space = this.size - used;
             let overlap = (block - (space / 2)) * 2;
@@ -77,6 +97,7 @@ class Row {
             }
         }, this);
         this.possibleRows = Row._arrayLogicalOr(this.unshiftables);
+        return this;
     }
 
     static checkLengths(array) {
@@ -118,8 +139,7 @@ class Row {
 if (require.main === module) {
     var blocks = argv._;
     if (blocks.filter((block) => !isNaN(block)).length == blocks.length) {
-        var row = new Row(blocks, argv.size);
-        var results = row.results();
+        var results = new Row(blocks, argv.size).analyze();
         if (results) {
             console.log(results);
         }
