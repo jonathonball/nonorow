@@ -15,9 +15,12 @@ class Row {
         this.value = Row.createRange(size, ' ');
         this.possibleRows = [];
         this.blocks = [].concat(data);
+        this.minGaps = undefined;
+        this.total = undefined;
+        this.maxDelta = undefined;
         this.setMinGaps();
-        this.findTotal();
-        this.maxDelta();
+        this.setTotal();
+        this.setMaxDelta();
         this.findUnshiftable();
         return this;
     }
@@ -31,12 +34,9 @@ class Row {
         return (gaps) ? gaps : 0;
     }
 
-    setMinGaps(blocks = null) {
-        if (blocks && Array.isArray(blocks)) {
-            this.minGaps = blocks;
-        } else {
-            this.minGaps = Row.countGaps(this.blocks);
-        }
+    setMinGaps() {
+        this.minGaps = Row.countGaps(this.blocks);
+        return this;
     }
 
     static findTotal(blocks, gaps) {
@@ -45,11 +45,12 @@ class Row {
         return (total > 0) ? total : 0;
     }
 
-    findTotal() {
+    setTotal() {
         this.total = Row.findTotal(this.blocks, this.minGaps);
+        return this;
     }
 
-    maxDelta() {
+    setMaxDelta() {
         this.maxDelta = this.size - this.total;
     }
 
