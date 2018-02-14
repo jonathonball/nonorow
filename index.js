@@ -15,7 +15,7 @@ class Row {
         this.value = Row.createRange(size, ' ');
         this.possibleRows = [];
         this.blocks = [].concat(data);
-        this.countGaps();
+        this.setMinGaps();
         this.findTotal();
         this.maxDelta();
         this.findUnshiftable();
@@ -31,8 +31,12 @@ class Row {
         return (gaps) ? gaps : 0;
     }
 
-    countGaps() {
-        this.minGaps = Row.countGaps(this.blocks);
+    setMinGaps(blocks = null) {
+        if (blocks && Array.isArray(blocks)) {
+            this.minGaps = blocks;
+        } else {
+            this.minGaps = Row.countGaps(this.blocks);
+        }
     }
 
     static findTotal(blocks, gaps) {
